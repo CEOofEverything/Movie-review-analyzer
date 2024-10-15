@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'analyze/images/favicon.ico' %}" type="image/x-icon">
+    <link rel="icon" href="{% static 'analyze/images/favicon.png' %}" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link type="text/css" href="{% static 'analyze/css/submit_review.css' %}" rel="stylesheet" />
+    <title>Review Analyzer</title>
+</head>
+<body>
+    <div class="header">
+        <div class="logo"> Review Analyzer</div>
+    </div>
+
+    <div class="container">
+        <!-- Форма для отправки отзыва -->
+        <form id="reviewForm" method="post">
+            {% csrf_token %}
+            <textarea id="reviewText" name="text" placeholder="Enter your review here..."></textarea>
+            <button type="submit">Submit review</button>
+            <p id="error" style="color: red; display: none; font-family: 'Montserrat'; text-align: center;">Please enter a review before submitting</p>
+        </form>
+        
+        <!-- Отображение результата, если он существует -->
+        {% if result %}
+        <div class="result">
+            <h2>Result:</h2>
+            <p><strong>Review:</strong> {{result.review}}</p>
+            <p><strong>Rating:</strong> {{result.rating}}</p>
+            <p>
+                <strong>Status:</strong>
+                <span class="status {% if result.status == 'Positive' %}positive{% elif result.status == 'Negative' %}negative{% endif %}">
+                    {{ result.status }}
+                </span>
+            </p>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        <!--Находим форму и текстовое поле по id-->
+    
+        const form = document.getElementById('reviewForm');
+        const reviewText = document.getElementById('reviewText');
+        const error = document.getElementById('error');
+        
+        <!--Добавляем обработчик события на отправку формы-->
+        form.addEventListener('submit', function(event) {
+            <!--Проверяем, есть ли текст в textarea-->
+            if (reviewText.value.trim() === '') {
+                <!--Если поле пустое, показываем сообщение об ошибке и отменяем отправку-->
+                event.preventDefault();
+                error.style.display = 'block';
+            } else {
+                <!--Если поле заполнено, скрываем сообщение об ошибке-->
+                error.style.display = 'none';
+                <!--После отправки формы очищаем её-->
+                setTimeout(function() {
+                    form.reset();
+                }, 1000); <!--Ожидание в 1 секунду для корректного завершения отправки-->
+            }
+        });
+    </script>
+</body>
+</html>
